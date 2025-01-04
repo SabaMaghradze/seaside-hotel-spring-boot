@@ -1,0 +1,63 @@
+Room and BookedRoom entities:
+
+1. Relationships Between Fields
+The relationship between Room and BookedRoom is a bidirectional one-to-many:
+
+Room (One) ↔ BookedRoom (Many):
+A single Room can have multiple bookings (@OneToMany relationship).
+The field private List<BookedRoom> bookings in the Room entity represents all the bookings associated with that room.
+BookedRoom (Many) ↔ Room (One):
+Each BookedRoom must be associated with exactly one Room (@ManyToOne relationship).
+The field private Room room in BookedRoom links a booking to its specific room.
+
+Owning Side: BookedRoom is the owning side because it has the @JoinColumn annotation, which tells Hibernate how
+to map the foreign key in the database. Mapped Side: Room is the mapped side, as it doesn’t manage the
+foreign key directly but relies on the BookedRoom side.
+
+Sides explained:
+
+In JPA (Java Persistence API), owning side and mapped side refer to how relationships between entities are
+managed and mapped in the database.
+
+The owning side is the entity that controls the relationship and is responsible for persisting and
+updating the relationship in the database. It defines the foreign key column.
+
+Characteristics:
+
+Contains the @JoinColumn annotation to specify the foreign key.
+Manages the relationship, so changes on this side affect the database.
+
+BookedRoom is the owning side because it has the @JoinColumn annotation, meaning the room field
+corresponds to a foreign key in the BookedRoom table.
+
+The mapped side is the entity that does not control the relationship and only reflects the relationship
+for convenience. It is mapped by the owning side.
+
+
+Cascading defines how operations on a parent entity propagate to related child entities. It simplifies
+the management of related entities by automatically applying the same operation to the child entities.
+
+2. constructor in the room class
+
+The Room constructor initializes the bookings list to an empty ArrayList:
+
+public Room() {
+    this.bookings = new ArrayList<>();
+}
+
+Reason for Initialization:
+Avoid NullPointerException: Without initializing, calling methods like add() on bookings would throw a
+NullPointerException since bookings would be null by default. Ensures Integrity: The Room entity is
+always created with a ready-to-use, empty list of bookings. This is especially important when you need
+to add bookings dynamically to the list.
+
+
+
+
+
+
+
+
+
+
+
