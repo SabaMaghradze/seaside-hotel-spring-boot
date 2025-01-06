@@ -50,10 +50,163 @@ Avoid NullPointerException: Without initializing, calling methods like add() on 
 NullPointerException since bookings would be null by default. Ensures Integrity: The Room entity is
 always created with a ready-to-use, empty list of bookings. This is especially important when you need
 to add bookings dynamically to the list.
+------------------------
+@Lob
+private Blob photo;
+
+@Lob Annotation
+@Lob stands for Large Object.
+It tells JPA/Hibernate that the field will store a large object in the database.
+Can be used for:
+Binary Data (e.g., images, audio, video, documents) stored as a BLOB (Binary Large Object).
+Character Data (e.g., large text files) stored as a CLOB (Character Large Object).
 
 
+Blob Field
+Blob (Binary Large Object) is a SQL data type used for storing large binary data.
+In Java, it's represented by the java.sql.Blob interface.
+Typically used to store non-text data like:
+Images
+Videos
+PDFs
+Other binary files.
 
+---------------------------------------------------------------------------------------------
 
+Response classes
+
+The response classes are DTOs (Data Transfer Object). DTOs are used to transfer data between
+layers in an application, such as from the back-end to the front-end. In this case, the RoomResponse
+class encapsulates data about a room and its associated bookings, tailored for returning a response to
+the client (e.g., a React frontend).
+
+Instead of directly exposing the Room entity to the client, a DTO is used to ensure that only the
+necessary and secure fields are sent. For example, the RoomResponse transforms the Blob or byte[] photo
+data into a Base64-encoded String for easy consumption by a client.
+
+----------------------------------
+
+Base64 is a binary-to-text encoding scheme. It converts binary data (e.g., image files) into an ASCII
+string. This is especially useful for transferring binary data in contexts where only text is allowed,
+such as JSON or HTML.
+
+How It Works:
+Binary data (e.g., an image in byte[] form) is split into chunks of 6 bits.
+Each 6-bit chunk is mapped to a character from a predefined set of 64 characters (A-Z, a-z, 0-9, +, /).
+The resulting string is padded with = characters to make the output length a multiple of 4.
+
+Let’s assume photoBytes represents the binary data of an image:
+
+byte[] photoBytes = {104, 101, 108, 108, 111}; // Corresponds to "hello" in ASCII
+Encode to Base64:
+Using the constructor in the class:
+
+String encodedPhoto = Base64.encodeBase64String(photoBytes);
+System.out.println("Encoded Photo: " + encodedPhoto);
+Output: Encoded Photo: aGVsbG8=
+
+Decoding Base64 Back to Binary:
+byte[] decodedBytes = Base64.decodeBase64(encodedPhoto);
+System.out.println("Decoded Photo: " + Arrays.toString(decodedBytes));
+Output: Decoded Photo: [104, 101, 108, 108, 111]
+
+-------------------------------------------------------------------------------
+
+Dependency Injection
+
+Dependency Injection is a design pattern where an object (or dependency) is provided to a class
+rather than the class creating the dependency itself.
+
+private RoomRepository roomRepository = new RoomRepository(); // Object created here
+
+Here, the RoomServiceImpl class directly creates the RoomRepository object.
+This seems simple, but it tightly couples the two classes, making the system rigid.
+
+Why Dependency Injection Is Needed
+a) Flexibility and Extensibility
+Imagine RoomRepository is an interface, and you have multiple implementations:
+
+SQLRoomRepository: Fetches rooms from an SQL database.
+NoSQLRoomRepository: Fetches rooms from a NoSQL database.
+MockRoomRepository: Used for testing.
+
+Without DI, you would have to modify RoomServiceImpl every time you want to switch implementations:
+private RoomRepository roomRepository = new SQLRoomRepository(); // Tightly coupled
+
+With DI, you just "inject" the desired implementation, without modifying RoomServiceImpl:
+private final RoomRepository roomRepository; // Implementation injected here
+
+----------------------------------------------------
+
+@RequiredArgsConstructor
+
+Usage: Commonly used in Spring Boot for dependency injection.
+
+When you annotate a class with @RequiredArgsConstructor, Lombok generates a constructor that
+includes parameters for all final fields or fields annotated with @NonNull. Non-final fields are
+excluded unless explicitly annotated with @NonNull
+
+Example:
+
+Without the annotation:
+
+@Component
+public class MyService {
+
+    private final MyRepository myRepository;
+    private final ExternalApi externalApi;
+
+    // Constructor for dependency injection
+    public MyService(MyRepository myRepository, ExternalApi externalApi) {
+        this.myRepository = myRepository;
+        this.externalApi = externalApi;
+    }
+}
+
+with annotation:
+
+@Component
+@RequiredArgsConstructor
+public class MyService {
+
+    private final MyRepository myRepository;
+    private final ExternalApi externalApi;
+
+    // No need to manually define the constructor
+}
+
+------
+
+DI with @Autowired vs @RequiredArgsConstructor
+
+The @Autowired annotation is used to inject dependencies automatically into a Spring-managed bean.
+
+How it works:
+Spring scans the context for a matching bean and injects it into the target field, constructor, or
+setter method. It can be applied to fields, constructors, or methods.
+
+Field Injection: You can directly annotate a field with @Autowired, but this is generally discouraged
+as it is harder to test and violates immutability.
+Constructor Injection: Constructor-based injection is preferred as it allows better testing and
+immutable dependencies.
+
+The @RequiredArgsConstructor annotation is a Lombok feature that generates a constructor for all
+final fields in the class.
+
+Constructor Injection: Only works with constructor injection since it generates the constructor
+automatically.
+Final Fields: Encourages immutability because all injected fields must be final
+
+----------------------------------------------------------------------------------------------
+
+Response entity constructors DO NOT determine the anatomy of JSON responses, meaning, JSON response
+will not contain just the fields put inside the constructor, in our add room case id roomType and
+roomPrice, but all the fields inside the response entity, the ones which are not utilized, will be
+assigned null
+
+The purpose of ResponseEntity in Spring is to represent the entire HTTP response, including the
+status code, headers, and body that will be sent back to the client. It is a flexible way to return
+a response from a controller(includes controlling response body).
 
 
 

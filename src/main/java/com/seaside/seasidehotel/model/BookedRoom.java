@@ -1,18 +1,14 @@
 package com.seaside.seasidehotel.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 
-@Entity
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
-@Getter
+@Entity
 public class BookedRoom {
 
     @Id
@@ -44,7 +40,7 @@ public class BookedRoom {
     private String confirmationCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room")
+    @JoinColumn(name = "room_id")
     private Room room;
 
     public void calculateTotalGuests() {
@@ -60,4 +56,22 @@ public class BookedRoom {
         this.numOfChildren = numOfChildren;
         calculateTotalGuests();
     }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,10 +1,7 @@
 package com.seaside.seasidehotel.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.math.BigDecimal;
@@ -12,10 +9,9 @@ import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
+@Data
 @AllArgsConstructor
-@Setter
-@Getter
+@Entity
 public class Room {
 
     @Id
@@ -31,7 +27,7 @@ public class Room {
 
     private boolean isBooked = false;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<BookedRoom> bookings;
 
     public Room() {
