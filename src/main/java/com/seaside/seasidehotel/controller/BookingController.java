@@ -1,4 +1,4 @@
 package com.seaside.seasidehotel.controller;
 
-public class BookedRoomController {
+public class BookingController {
 }

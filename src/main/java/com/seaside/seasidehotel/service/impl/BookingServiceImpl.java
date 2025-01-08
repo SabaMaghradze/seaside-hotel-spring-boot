@@ -1,5 +1,5 @@
 package com.seaside.seasidehotel.service.impl;
 
-public class BookedRoomServiceImpl {
+public class BookingServiceImpl {
 
 }

@@ -28,13 +28,13 @@ public class Room {
     private boolean isBooked = false;
 
     @OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<BookedRoom> bookings;
+    private List<Booking> bookings;
 
     public Room() {
         this.bookings = new ArrayList<>();
     }
 
-    public void addBooking(BookedRoom booking) {
+    public void addBooking(Booking booking) {
         if (bookings == null) {
             bookings = new ArrayList<>();
         }

@@ -4,7 +4,6 @@ import com.seaside.seasidehotel.model.Room;
 import com.seaside.seasidehotel.repository.RoomRepository;
 import com.seaside.seasidehotel.service.RoomService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
