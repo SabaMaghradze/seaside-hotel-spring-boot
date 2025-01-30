@@ -1,21 +1,24 @@
 package com.seaside.seasidehotel.controller;
 
+import com.seaside.seasidehotel.exception.PhotoRetrievalException;
+import com.seaside.seasidehotel.model.Booking;
 import com.seaside.seasidehotel.model.Room;
+import com.seaside.seasidehotel.response.BookingResponse;
 import com.seaside.seasidehotel.response.RoomResponse;
+import com.seaside.seasidehotel.service.BookingService;
 import com.seaside.seasidehotel.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.Blob;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,6 +26,7 @@ import java.util.Set;
 public class RoomController {
 
     private final RoomService roomService;
+    private final BookingService bookingService;
 
     @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping("/add/new-room")
@@ -46,6 +50,8 @@ public class RoomController {
         return roomTypes;
     }
 
+    @CrossOrigin(origins = "http://localhost:5173")
+    @GetMapping("/all-rooms")
     public ResponseEntity<List<RoomResponse>> getAllRooms() throws SQLException {
 
         List<Room> rooms = roomService.getAllRooms();
@@ -62,7 +68,56 @@ public class RoomController {
         }
         return ResponseEntity.ok(roomResponses);
     }
+
+    private RoomResponse getRoomResponse(Room room) {
+        List<Booking> bookings = bookingService.getAllBookingsByRoomId(room.getId());
+        List<BookingResponse> bookingsInfo = bookings
+                .stream()
+                .map(booking -> new BookingResponse(booking.getBookingId(),
+                        booking.getCheckInDate(),
+                        booking.getCheckOutDate(),
+                        booking.getConfirmationCode()))
+                .toList();
+
+        byte[] photo = null;
+        Blob roomPhoto = room.getPhoto();
+
+        if (roomPhoto != null) {
+            try {
+                photo = roomPhoto.getBytes(1, (int) roomPhoto.length());
+            } catch (SQLException e) {
+                throw new PhotoRetrievalException("Error retrieving photo");
+            }
+        }
+        return new RoomResponse(room.getId(), room.getRoomType(), room.getRoomPrice(), room.isBooked(), bookingsInfo, photo);
+    };
+
+    @CrossOrigin(origins = "http://localhost:5173")
+    @DeleteMapping("/deleteRoom/{roomId}")
+    public ResponseEntity<Map<String, Object>> deleteRoom(@PathVariable("roomId") Long roomId) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            roomService.deleteRoom(roomId);
+            response.put("message", "success");
+            response.put("roomId", roomId);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("message", "error");
+            response.put("details", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+
+    }
 }
+
+
+
+
+
+
+
 
 
 

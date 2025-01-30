@@ -1,15 +1,11 @@
 package com.seaside.seasidehotel.service.impl;
-
 import com.seaside.seasidehotel.exception.ResourceNotFoundException;
 import com.seaside.seasidehotel.model.Room;
 import com.seaside.seasidehotel.repository.RoomRepository;
 import com.seaside.seasidehotel.service.RoomService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
-
 import javax.sql.rowset.serial.SerialBlob;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -60,20 +56,28 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public byte[] getRoomPhotoByRoomId(Long roomId) throws SQLException {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Failed to find the room with id " + roomId));
 
-        Optional<Room> theRoom = roomRepository.findById(roomId);
-
-        if (theRoom.isEmpty()) {
-            throw new ResourceNotFoundException("Failed to get the room");
+        Blob photoBlob = room.getPhoto();
+        if (photoBlob == null) {
+            return new byte[0];
         }
+        return photoBlob.getBytes(1, (int) photoBlob.length());
+    }
 
-        Blob photoBlob = theRoom.get().getPhoto();
-        if (photoBlob != null) {
-            return photoBlob.getBytes(1, (int) photoBlob.length());
-        }
-        return null;
+    @Override
+    public void deleteRoom(Long roomId) {
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new ResourceNotFoundException("Failed to find the room with id " + roomId));
+
+        roomRepository.delete(room);
     }
 }
+
+
+
+
+
 
 
 
