@@ -31,13 +31,20 @@ public class RoomController {
     @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping("/add/new-room")
     public ResponseEntity<RoomResponse> addNewRoom(
-            @RequestParam("picture")MultipartFile pic,
+            @RequestParam(value = "picture", required = false) MultipartFile pic,
             @RequestParam("roomType") String roomType,
-            @RequestParam("roomPrice")BigDecimal roomPrice) throws SQLException, IOException {
+            @RequestParam("roomPrice") BigDecimal roomPrice) throws SQLException, IOException {
 
         Room saveRoom = roomService.addNewRoom(pic, roomType, roomPrice);
 
         RoomResponse response = new RoomResponse(saveRoom.getId(), saveRoom.getRoomType(), saveRoom.getRoomPrice());
+
+        // removable
+        if (pic != null && !pic.isEmpty()) {
+            byte[] photoBytes = roomService.getRoomPhotoByRoomId(saveRoom.getId());
+            String base64Photo = Base64.encodeBase64String(photoBytes);
+            response.setPhoto(base64Photo);
+        }
 
         return ResponseEntity.ok(response);
     }
@@ -58,13 +65,13 @@ public class RoomController {
         List<RoomResponse> roomResponses = new ArrayList<>();
 
         for (Room room : rooms) {
+            RoomResponse roomResponse = new RoomResponse(room.getId(), room.getRoomType(), room.getRoomPrice());
             byte[] photoBytes = roomService.getRoomPhotoByRoomId(room.getId());
             if (photoBytes != null && photoBytes.length > 0) {
                 String base64Photo = Base64.encodeBase64String(photoBytes);
-                RoomResponse roomResponse = new RoomResponse(room.getId(), room.getRoomType(), room.getRoomPrice());
                 roomResponse.setPhoto(base64Photo);
-                roomResponses.add(roomResponse);
             }
+            roomResponses.add(roomResponse);
         }
         return ResponseEntity.ok(roomResponses);
     }
@@ -90,7 +97,7 @@ public class RoomController {
             }
         }
         return new RoomResponse(room.getId(), room.getRoomType(), room.getRoomPrice(), room.isBooked(), bookingsInfo, photo);
-    };
+    }
 
     @CrossOrigin(origins = "http://localhost:5173")
     @DeleteMapping("/deleteRoom/{roomId}")

@@ -27,7 +27,7 @@ public class RoomServiceImpl implements RoomService {
         room.setRoomType(roomType);
         room.setRoomPrice(roomPrice);
 
-        if (!pic.isEmpty()) {
+        if (pic != null && !pic.isEmpty()) {
             byte[] bytes = pic.getBytes();
             Blob photoBlob = new SerialBlob(bytes);
             room.setPhoto(photoBlob);
