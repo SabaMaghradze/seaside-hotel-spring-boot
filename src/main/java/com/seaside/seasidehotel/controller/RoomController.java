@@ -76,29 +76,6 @@ public class RoomController {
         return ResponseEntity.ok(roomResponses);
     }
 
-    private RoomResponse getRoomResponse(Room room) {
-        List<Booking> bookings = bookingService.getAllBookingsByRoomId(room.getId());
-        List<BookingResponse> bookingsInfo = bookings
-                .stream()
-                .map(booking -> new BookingResponse(booking.getBookingId(),
-                        booking.getCheckInDate(),
-                        booking.getCheckOutDate(),
-                        booking.getConfirmationCode()))
-                .toList();
-
-        byte[] photo = null;
-        Blob roomPhoto = room.getPhoto();
-
-        if (roomPhoto != null) {
-            try {
-                photo = roomPhoto.getBytes(1, (int) roomPhoto.length());
-            } catch (SQLException e) {
-                throw new PhotoRetrievalException("Error retrieving photo");
-            }
-        }
-        return new RoomResponse(room.getId(), room.getRoomType(), room.getRoomPrice(), room.isBooked(), bookingsInfo, photo);
-    }
-
     @CrossOrigin(origins = "http://localhost:5173")
     @DeleteMapping("/deleteRoom/{roomId}")
     public ResponseEntity<Map<String, Object>> deleteRoom(@PathVariable("roomId") Long roomId) {
@@ -115,6 +92,28 @@ public class RoomController {
             response.put("details", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+
+    }
+
+    @CrossOrigin(origins = "http://localhost:5173")
+    @PatchMapping("/update/{roomId}")
+    public ResponseEntity<RoomResponse>
+    updateRoom(@PathVariable Long roomId,
+               @RequestParam(required = false) String roomType,
+               @RequestParam(required = false) BigDecimal roomPrice,
+               @RequestParam(required = false) MultipartFile pic) throws SQLException, IOException {
+
+        Room room = roomService.updateRoom(roomId, roomType, roomPrice, pic);
+
+        RoomResponse response = new RoomResponse(room.getId(), room.getRoomType(), room.getRoomPrice());
+
+        byte[] photoBytes = roomService.getRoomPhotoByRoomId(room.getId());
+        if (photoBytes != null && photoBytes.length > 0) {
+            String base64Photo = Base64.encodeBase64String(photoBytes);
+            response.setPhoto(base64Photo);
+        }
+
+        return ResponseEntity.ok(response);
 
     }
 }

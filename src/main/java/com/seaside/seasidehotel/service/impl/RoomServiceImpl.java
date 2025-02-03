@@ -72,7 +72,58 @@ public class RoomServiceImpl implements RoomService {
 
         roomRepository.delete(room);
     }
+
+    @Override
+    public Room updateRoom(Long roomId, String roomType, BigDecimal roomPrice, MultipartFile pic) throws IOException, SQLException {
+
+        Optional<Room> optionalRoom = roomRepository.findById(roomId);
+
+        if (optionalRoom.isEmpty()) {
+            throw new RuntimeException("Room not found with id " + roomId);
+        }
+
+        Room room = optionalRoom.get();
+
+        if (roomType != null) {
+            room.setRoomType(roomType);
+        }
+
+        room.setRoomPrice(roomPrice);
+
+        if (pic != null && !pic.isEmpty()) {
+            byte[] bytes = pic.getBytes();
+            Blob photoBlob = new SerialBlob(bytes);
+            room.setPhoto(photoBlob);
+        } else {
+            room.setPhoto(null);
+        }
+
+        return roomRepository.save(room);
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
