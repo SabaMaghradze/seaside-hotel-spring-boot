@@ -79,7 +79,7 @@ public class RoomServiceImpl implements RoomService {
         Optional<Room> optionalRoom = roomRepository.findById(roomId);
 
         if (optionalRoom.isEmpty()) {
-            throw new RuntimeException("Room not found with id " + roomId);
+            throw new ResourceNotFoundException("Room not found with id " + roomId);
         }
 
         Room room = optionalRoom.get();
