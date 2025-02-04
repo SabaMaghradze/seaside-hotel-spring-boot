@@ -7,6 +7,7 @@ import com.seaside.seasidehotel.response.BookingResponse;
 import com.seaside.seasidehotel.response.RoomResponse;
 import com.seaside.seasidehotel.service.BookingService;
 import com.seaside.seasidehotel.service.RoomService;
+import com.seaside.seasidehotel.service.impl.RoomServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,29 @@ public class RoomController {
 
     private final RoomService roomService;
     private final BookingService bookingService;
+
+    private RoomResponse getRoomResponse(Room room) {
+        List<Booking> bookings = bookingService.getAllBookingsByRoomId(room.getId());
+        List<BookingResponse> bookingsInfo = bookings
+                .stream()
+                .map(booking -> new BookingResponse(booking.getBookingId(),
+                        booking.getCheckInDate(),
+                        booking.getCheckOutDate(),
+                        booking.getConfirmationCode()))
+                .toList();
+
+        byte[] photo = null;
+        Blob roomPhoto = room.getPhoto();
+
+        if (roomPhoto != null) {
+            try {
+                photo = roomPhoto.getBytes(1, (int) roomPhoto.length());
+            } catch (SQLException e) {
+                throw new PhotoRetrievalException("Error retrieving photo");
+            }
+        }
+        return new RoomResponse(room.getId(), room.getRoomType(), room.getRoomPrice(), room.isBooked(), bookingsInfo, photo);
+    }
 
     @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping("/add/new-room")
@@ -93,6 +117,17 @@ public class RoomController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
 
+    }
+
+    @CrossOrigin(origins = "http://localhost:5173")
+    @GetMapping("/room/{roomId}")
+    public ResponseEntity<RoomResponse> getRoomById(@PathVariable Long roomId) {
+
+        Room room = roomService.getRoomById(roomId);
+
+        RoomResponse response = getRoomResponse(room);
+
+        return ResponseEntity.ok(response);
     }
 
     @CrossOrigin(origins = "http://localhost:5173")

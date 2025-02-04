@@ -100,6 +100,12 @@ public class RoomServiceImpl implements RoomService {
 
         return roomRepository.save(room);
     }
+
+    @Override
+    public Room getRoomById(Long roomId) {
+        return roomRepository.findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Failed to find room with id: " + roomId));
+    }
 }
 
 
