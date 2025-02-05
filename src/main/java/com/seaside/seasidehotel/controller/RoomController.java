@@ -131,12 +131,12 @@ public class RoomController {
     }
 
     @CrossOrigin(origins = "http://localhost:5173")
-    @PatchMapping("/update/{roomId}")
+    @PutMapping("/update/{roomId}")
     public ResponseEntity<RoomResponse>
     updateRoom(@PathVariable Long roomId,
                @RequestParam(required = false) String roomType,
                @RequestParam(required = false) BigDecimal roomPrice,
-               @RequestParam(required = false) MultipartFile pic) throws SQLException, IOException {
+               @RequestParam(value = "picture", required = false) MultipartFile pic) throws SQLException, IOException {
 
         Room room = roomService.updateRoom(roomId, roomType, roomPrice, pic);
 
