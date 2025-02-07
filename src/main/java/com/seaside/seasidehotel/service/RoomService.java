@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
-@Service
+
 public interface RoomService {
     Room addNewRoom(MultipartFile pic, String roomType, BigDecimal roomPrice) throws SQLException, IOException;
     Set<String> getAllRoomTypes();
