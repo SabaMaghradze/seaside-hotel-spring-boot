@@ -21,6 +21,7 @@ import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.*;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/rooms")
@@ -52,7 +53,6 @@ public class RoomController {
         return new RoomResponse(room.getId(), room.getRoomType(), room.getRoomPrice(), room.isBooked(), bookingsInfo, photo);
     }
 
-    @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping("/add/new-room")
     public ResponseEntity<RoomResponse> addNewRoom(
             @RequestParam(value = "picture", required = false) MultipartFile pic,
@@ -73,7 +73,6 @@ public class RoomController {
         return ResponseEntity.ok(response);
     }
 
-    @CrossOrigin(origins = "http://localhost:5173")
     @GetMapping("/room-types")
     public Set<String> getAllRoomTypes() {
         Set<String> roomTypes = roomService.getAllRoomTypes();
@@ -81,7 +80,6 @@ public class RoomController {
         return roomTypes;
     }
 
-    @CrossOrigin(origins = "http://localhost:5173")
     @GetMapping("/all-rooms")
     public ResponseEntity<List<RoomResponse>> getAllRooms() throws SQLException {
 
@@ -100,7 +98,6 @@ public class RoomController {
         return ResponseEntity.ok(roomResponses);
     }
 
-    @CrossOrigin(origins = "http://localhost:5173")
     @DeleteMapping("/deleteRoom/{roomId}")
     public ResponseEntity<Map<String, Object>> deleteRoom(@PathVariable("roomId") Long roomId) {
 
@@ -119,7 +116,6 @@ public class RoomController {
 
     }
 
-    @CrossOrigin(origins = "http://localhost:5173")
     @GetMapping("/room/{roomId}")
     public ResponseEntity<RoomResponse> getRoomById(@PathVariable Long roomId) {
 
@@ -130,7 +126,6 @@ public class RoomController {
         return ResponseEntity.ok(response);
     }
 
-    @CrossOrigin(origins = "http://localhost:5173")
     @PutMapping("/update/{roomId}")
     public ResponseEntity<RoomResponse>
     updateRoom(@PathVariable Long roomId,

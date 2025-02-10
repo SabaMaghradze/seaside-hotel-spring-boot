@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/bookings")
@@ -40,7 +41,6 @@ public class BookingController {
                 booking.getConfirmationCode(), roomResponse);
     }
 
-    @CrossOrigin(origins = "http://localhost:5127")
     @GetMapping("/all-bookings")
     public ResponseEntity<List<BookingResponse>> getAllBookings() {
 
@@ -57,7 +57,6 @@ public class BookingController {
         return ResponseEntity.ok(responses);
     }
 
-    @CrossOrigin(origins = "http://localhost:5172")
     @GetMapping("/confirmation/{confirmationCode}")
     public ResponseEntity<?> getBookingByConfirmationCode(@PathVariable String confirmationCode) {
         try {
@@ -69,7 +68,6 @@ public class BookingController {
         }
     }
 
-    @CrossOrigin(origins = "http://localhost:5127")
     @PostMapping("/room/{roomId}/booking")
     public ResponseEntity<?> saveBooking(@PathVariable Long roomId, @RequestBody Booking booking) {
         try {

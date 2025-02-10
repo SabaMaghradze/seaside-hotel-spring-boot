@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,9 +40,17 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public String saveBooking(Long roomId, Booking booking) {
+
+        LocalDate today = LocalDate.now();
+
+        if (booking.getCheckInDate().isBefore(today)) {
+            throw new InvalidBookingRequestException("Check-in date cannot be in the past");
+        }
+
         if (booking.getCheckOutDate().isBefore(booking.getCheckInDate())) {
             throw new InvalidBookingRequestException("Check-in date must come before check-out date");
         }
+
         Room room = roomService.getRoomById(roomId);
         List<Booking> existingBookings = room.getBookings();
         boolean isRoomAvailable = roomIsAvailable(booking, existingBookings);
