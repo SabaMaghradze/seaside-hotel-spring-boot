@@ -9,9 +9,11 @@ import com.seaside.seasidehotel.response.BookingResponse;
 import com.seaside.seasidehotel.response.RoomResponse;
 import com.seaside.seasidehotel.service.BookingService;
 import com.seaside.seasidehotel.service.RoomService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -69,7 +71,7 @@ public class BookingController {
     }
 
     @PostMapping("/room/{roomId}/booking")
-    public ResponseEntity<?> saveBooking(@PathVariable Long roomId, @RequestBody Booking booking) {
+    public ResponseEntity<?> saveBooking(@PathVariable Long roomId, @Valid @RequestBody Booking booking) {
         try {
             String confirmationCode = bookingService.saveBooking(roomId, booking);
             return ResponseEntity.ok
