@@ -22,4 +22,14 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             @Param("checkInDate") LocalDate checkInDate,
             @Param("checkOutDate") LocalDate checkOutDate,
             @Param("roomType") String roomType);
+
+
+    @Query(" SELECT r FROM Room r "  +
+            " WHERE r.id NOT IN (" +
+            "  SELECT br.room.id FROM Booking br " +
+            "  WHERE ((br.checkInDate <= :checkOutDate) AND (br.checkOutDate >= :checkInDate))" +
+            ")")
+    List<Room> findAvailableRoomsByDates(
+            @Param("checkInDate") LocalDate checkInDate,
+            @Param("checkOutDate") LocalDate checkOutDate);
 }

@@ -113,6 +113,9 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public List<Room> getAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, String roomType)
             throws SQLException {
+        if (roomType == null || roomType.isEmpty()) {
+            return roomRepository.findAvailableRoomsByDates(checkInDate, checkOutDate);
+        }
         return roomRepository.findAvailableRoomsByDatesAndType(checkInDate, checkOutDate, roomType);
     }
 }
