@@ -50,10 +50,7 @@ public class BookingController {
         List<BookingResponse> responses = new ArrayList<>();
 
         for (Booking booking : allBookings) {
-            BookingResponse response = new BookingResponse(booking.getBookingId(),
-                    booking.getCheckInDate(),
-                    booking.getCheckOutDate(),
-                    booking.getConfirmationCode());
+            BookingResponse response = getBookingResponse(booking);
             responses.add(response);
         }
         return ResponseEntity.ok(responses);
@@ -81,7 +78,7 @@ public class BookingController {
         }
     }
 
-    @DeleteMapping("/booking/{bookingId}/delete")
+    @DeleteMapping("/{bookingId}/delete")
     public ResponseEntity<Map<String, Object>> cancelBooking(@PathVariable Long bookingId) {
 
         Map<String, Object> response = new HashMap<>();

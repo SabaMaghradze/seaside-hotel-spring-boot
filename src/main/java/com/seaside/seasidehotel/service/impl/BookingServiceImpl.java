@@ -1,6 +1,7 @@
 package com.seaside.seasidehotel.service.impl;
 
 import com.seaside.seasidehotel.exception.InvalidBookingRequestException;
+import com.seaside.seasidehotel.exception.ResourceNotFoundException;
 import com.seaside.seasidehotel.model.Booking;
 import com.seaside.seasidehotel.model.Room;
 import com.seaside.seasidehotel.repository.BookingRepository;
@@ -35,7 +36,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking findByConfirmationCode(String confirmationCode) {
-        return bookingRepository.findByConfirmationCode(confirmationCode);
+        return bookingRepository.findByConfirmationCode(confirmationCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Couldn't find the booking with confirmation code: " + confirmationCode));
     }
 
     @Override
