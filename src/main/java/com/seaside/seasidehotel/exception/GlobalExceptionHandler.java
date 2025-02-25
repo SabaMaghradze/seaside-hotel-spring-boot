@@ -17,8 +17,28 @@ public class GlobalExceptionHandler {
 
         Map<String, String> errors = new HashMap<>();
         exc.getBindingResult().getFieldErrors().forEach(err ->
-            errors.put(err.getField(), err.getDefaultMessage()));
+                errors.put(err.getField(), err.getDefaultMessage()));
 
         return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException exc) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exc.getMessage());
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<String> handleUserAlreadyExistsException(UserAlreadyExistsException exc) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(exc.getMessage());
+    }
+
+    @ExceptionHandler(RoleNotFoundException.class)
+    public ResponseEntity<String> handleRoleNotFound(RoleNotFoundException exc) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exc.getMessage());
+    }
+
+    @ExceptionHandler(RoleAlreadyExistsException.class)
+    public ResponseEntity<String> handleRoleAlreadyExistsException(RoleAlreadyExistsException exc) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(exc.getMessage());
     }
 }

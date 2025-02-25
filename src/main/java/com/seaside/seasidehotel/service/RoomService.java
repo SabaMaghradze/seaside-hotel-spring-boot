@@ -1,3 +1,4 @@
+
 package com.seaside.seasidehotel.service;
 
 import com.seaside.seasidehotel.model.Room;
