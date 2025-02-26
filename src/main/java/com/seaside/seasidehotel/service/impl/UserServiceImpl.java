@@ -48,6 +48,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void deleteUser(String email) {
+
+        if (!userRepository.existsByEmail(email)) {
+            throw new UserNotFoundException("User not found");
+        }
         userRepository.deleteByEmail(email);
     }
 

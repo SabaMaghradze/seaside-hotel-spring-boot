@@ -1,4 +1,4 @@
-package com.seaside.seasidehotel.config;
+package com.seaside.seasidehotel.security;
 
 
 import org.springframework.context.annotation.Bean;
@@ -41,3 +41,4 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
+

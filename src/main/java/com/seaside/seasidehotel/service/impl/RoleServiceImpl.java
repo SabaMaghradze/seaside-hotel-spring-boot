@@ -2,6 +2,7 @@ package com.seaside.seasidehotel.service.impl;
 
 import com.seaside.seasidehotel.exception.RoleAlreadyExistsException;
 import com.seaside.seasidehotel.exception.RoleNotFoundException;
+import com.seaside.seasidehotel.exception.UserAlreadyExistsException;
 import com.seaside.seasidehotel.exception.UserNotFoundException;
 import com.seaside.seasidehotel.model.Role;
 import com.seaside.seasidehotel.model.User;
@@ -10,13 +11,12 @@ import com.seaside.seasidehotel.service.RoleService;
 import com.seaside.seasidehotel.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Optional;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
@@ -39,6 +39,9 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public void deleteRole(Long roleId) {
+        if (!roleRepository.existsById(roleId)) {
+            throw new RoleNotFoundException("Role not found");
+        }
         this.stripAllUsersOfRole(roleId);
         roleRepository.deleteById(roleId);
     }
@@ -53,25 +56,41 @@ public class RoleServiceImpl implements RoleService {
     public User stripUserOfRole(String userId, Long roleId) {
 
         User user = userService.getUser(userId);
-        Optional<Role> role = roleRepository.findById(roleId);
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RoleNotFoundException("Role not found."));
 
-        if (role.isPresent() && role.get().getUsers().contains(user.getEmail())) {
-            role.get().stripUserOfRole(user);
-            roleRepository.save(role.get());
+        if (role.getUsers().contains(user.getEmail())) {
+            role.stripUserOfRole(user);
+            roleRepository.save(role);
             return user;
-        } else if (!role.isPresent()) {
-            throw new RoleNotFoundException("Role not found");
         }
         throw new UserNotFoundException("User not found");
     }
 
     @Override
-    public User asignRoleToUser(Long userId, Long roleId) {
-        return null;
+    public User assignUserToRole(String userId, Long roleId) {
+
+        User user = userService.getUser(userId);
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RoleNotFoundException("Role not found."));
+
+        if (user != null && user.getRoles().contains(role)) {
+            throw new UserAlreadyExistsException(user.getFirstName() + " is already assigned the role.");
+        }
+
+        role.assignUserToRole(user);
+        roleRepository.save(role);
+
+        return user;
     }
 
     @Override
     public Role stripAllUsersOfRole(Long roleId) {
-        return null;
+
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RoleNotFoundException("Role not found"));
+
+        this.stripAllUsersOfRole(roleId);
+        return roleRepository.save(role);
     }
 }

@@ -1,5 +1,6 @@
 package com.seaside.seasidehotel.service;
 
+import com.seaside.seasidehotel.exception.RoleNotFoundException;
 import com.seaside.seasidehotel.model.Role;
 import com.seaside.seasidehotel.model.User;
 
@@ -17,7 +18,7 @@ public interface RoleService {
 
     User stripUserOfRole(String userId, Long roleId);
 
-    User asignRoleToUser(Long userId, Long roleId);
+    User assignUserToRole(String userId, Long roleId);
 
     Role stripAllUsersOfRole(Long roleId);
 }

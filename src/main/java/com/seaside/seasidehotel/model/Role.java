@@ -27,7 +27,7 @@ public class Role {
         this.name = name;
     }
 
-    public void assignRoleToUser(User user) {
+    public void assignUserToRole(User user) {
         user.getRoles().add(this);
         this.getUsers().add(user);
     }
@@ -40,7 +40,7 @@ public class Role {
     public void stripAllUsersOfRole() {
         if (this.getUsers() != null) {
             List<User> roleUsers = this.getUsers().stream().toList();
-            roleUsers.forEach(this :: stripUserOfRole); // equivalent of forEach(user -> stipUserOfRole(user))
+            roleUsers.forEach(this :: stripUserOfRole); // equivalent of forEach(user -> stripUserOfRole(user))
         }
     }
 }
