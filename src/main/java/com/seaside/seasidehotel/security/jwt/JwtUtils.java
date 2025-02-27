@@ -16,7 +16,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.List;
 
-
+//Handles JWT token creation, validation, and extraction.
 @Component
 public class JwtUtils {
 

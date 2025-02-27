@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+
+// intercepts every HTTP request to validate the JWT and authenticate the user.
+
+// OncePerRequestFilter - A Spring Security filter that ensures each request is filtered only once
+// per request cycle.
 public class AuthTokenFilter extends OncePerRequestFilter {
 
     @Autowired
@@ -27,16 +33,24 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 
+//    Intercepts every request and processes authentication logic.
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            String jwt = parseJwt(request);
+
+            String jwt = parseJwt(request); // extract the JWT from the request header.
+
             if (jwt != null && jwtUtils.isTokenValid(jwt)) {
+
                 String email = jwtUtils.getUserNameFromToken(jwt);
                 UserDetails userDetails = userDtlsService.loadUserByUsername(email);
+
+                //  Creates a Spring Security authentication object.
+                //  Stores the authentication object in the SecurityContext, making the user
+                //  authenticated for this request.
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
@@ -44,9 +58,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             logger.error("Cannot set user authentication : {}", e.getMessage());
         }
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(request, response); // Passes the request to the next filter
     }
 
+//    Extracts JWT from the Authorization header.
+//    If it starts with "Bearer ", removes that prefix and returns the token.
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
         if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {

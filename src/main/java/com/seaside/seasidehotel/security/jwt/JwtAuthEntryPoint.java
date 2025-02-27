@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -15,14 +13,19 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+// Handles unauthorized access by sending a structured JSON response instead of the default HTML
+// error page. Returns JSON response with error details.
+
+// AuthenticationEntryPoint → Handles authentication failures.
 @Component
 public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
 
+//    Called when an unauthorized request is made (e.g., missing/invalid token).
     @Override
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
-
+        
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
