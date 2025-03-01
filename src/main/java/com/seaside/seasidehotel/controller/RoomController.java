@@ -7,7 +7,6 @@ import com.seaside.seasidehotel.response.BookingResponse;
 import com.seaside.seasidehotel.response.RoomResponse;
 import com.seaside.seasidehotel.service.BookingService;
 import com.seaside.seasidehotel.service.RoomService;
-import com.seaside.seasidehotel.service.impl.RoomServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -23,7 +22,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/rooms")

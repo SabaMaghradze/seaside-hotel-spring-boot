@@ -1,6 +1,5 @@
 package com.seaside.seasidehotel.controller;
 
-
 import com.seaside.seasidehotel.exception.InvalidBookingRequestException;
 import com.seaside.seasidehotel.exception.ResourceNotFoundException;
 import com.seaside.seasidehotel.model.Booking;
@@ -13,12 +12,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/bookings")

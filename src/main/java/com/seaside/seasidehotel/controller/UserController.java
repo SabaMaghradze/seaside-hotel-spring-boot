@@ -1,6 +1,5 @@
 package com.seaside.seasidehotel.controller;
 
-import com.seaside.seasidehotel.exception.UserNotFoundException;
 import com.seaside.seasidehotel.model.User;
 import com.seaside.seasidehotel.service.RoleService;
 import com.seaside.seasidehotel.service.UserService;
@@ -10,9 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
