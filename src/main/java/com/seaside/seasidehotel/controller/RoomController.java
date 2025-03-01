@@ -12,6 +12,7 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -54,6 +55,7 @@ public class RoomController {
     }
 
     @PostMapping("/add/new-room")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<RoomResponse> addNewRoom(
             @RequestParam(value = "picture", required = false) MultipartFile pic,
             @RequestParam("roomType") String roomType,
@@ -99,6 +101,7 @@ public class RoomController {
     }
 
     @DeleteMapping("/deleteRoom/{roomId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Map<String, Object>> deleteRoom(@PathVariable("roomId") Long roomId) {
 
         Map<String, Object> response = new HashMap<>();
@@ -127,6 +130,7 @@ public class RoomController {
     }
 
     @PutMapping("/update/{roomId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<RoomResponse>
     updateRoom(@PathVariable Long roomId,
                @RequestParam(required = false) String roomType,

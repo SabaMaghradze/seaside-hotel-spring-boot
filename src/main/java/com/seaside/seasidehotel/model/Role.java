@@ -12,12 +12,14 @@ import java.util.stream.Collectors;
 @Setter
 @NoArgsConstructor
 @Entity
+@Table(name = "roles")
 public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "roleName")
     private String name;
 
     @ManyToMany(mappedBy = "roles")
