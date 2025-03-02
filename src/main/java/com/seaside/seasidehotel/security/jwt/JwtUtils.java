@@ -1,6 +1,5 @@
 package com.seaside.seasidehotel.security.jwt;
 
-import com.seaside.seasidehotel.model.Role;
 import com.seaside.seasidehotel.security.user.UserDtls;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -40,8 +39,8 @@ public class JwtUtils {
                 .map(GrantedAuthority::getAuthority).toList();
 
         return Jwts.builder() // builds and signs JWT tokens
-                .setSubject(userPrincipal.getUsername()) // sets the subject of JWT to the authenticated user's username.
-                .claim("roles", roles) // adds custom claims to JWT, later decoded to check user's roles.
+                .setSubject(userPrincipal.getUsername()) // sets the subject of JWT payload to the authenticated user's username.
+                .claim("roles", roles) // adds custom claims to JWT payload, later decoded to check user's roles.
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationTime))
                 .signWith(key(), SignatureAlgorithm.HS256).compact();
