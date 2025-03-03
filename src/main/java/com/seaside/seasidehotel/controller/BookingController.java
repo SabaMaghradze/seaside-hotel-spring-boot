@@ -8,6 +8,7 @@ import com.seaside.seasidehotel.response.BookingResponse;
 import com.seaside.seasidehotel.response.RoomResponse;
 import com.seaside.seasidehotel.service.BookingService;
 import com.seaside.seasidehotel.service.RoomService;
+import com.seaside.seasidehotel.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ public class BookingController {
 
     private final BookingService bookingService;
     private final RoomService roomService;
+    private final UserService userService;
 
     private BookingResponse getBookingResponse(Booking booking) {
         Room room = roomService.getRoomById(booking.getRoom().getId());
@@ -90,6 +92,20 @@ public class BookingController {
             response.put("details", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+    }
+
+    @GetMapping("/user/{userEmail}")
+    public ResponseEntity<?> getBookingsByUserEmail(@PathVariable String userEmail) {
+
+        List<Booking> bookings = bookingService.getBookingsByUserEmail(userEmail);
+        List<BookingResponse> responses = new ArrayList<>();
+
+        for (Booking booking : bookings) {
+            BookingResponse response = getBookingResponse(booking);
+            responses.add(response);
+        }
+
+        return ResponseEntity.status(HttpStatus.FOUND).body(responses);
     }
 }
 
