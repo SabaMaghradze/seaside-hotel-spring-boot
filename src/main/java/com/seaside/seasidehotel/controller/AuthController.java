@@ -1,5 +1,6 @@
 package com.seaside.seasidehotel.controller;
 
+import com.seaside.seasidehotel.exception.BadCredentialsException;
 import com.seaside.seasidehotel.model.User;
 import com.seaside.seasidehotel.request.LoginRequest;
 import com.seaside.seasidehotel.response.JwtResponse;
@@ -36,25 +37,29 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
-        Authentication authentication = authManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+        try {
+            Authentication authentication = authManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwt(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtUtils.generateJwt(authentication);
 
-        UserDtls userDetails = (UserDtls) authentication.getPrincipal();
+            UserDtls userDetails = (UserDtls) authentication.getPrincipal();
 
-        List<String> roles = userDetails
-                .getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority).toList();
+            List<String> roles = userDetails
+                    .getAuthorities()
+                    .stream()
+                    .map(GrantedAuthority::getAuthority).toList();
 
-        return ResponseEntity.ok(new JwtResponse(
-                userDetails.getId(),
-                userDetails.getEmail(),
-                jwt,
-                roles
-        ));
+            return ResponseEntity.ok(new JwtResponse(
+                    userDetails.getId(),
+                    userDetails.getEmail(),
+                    jwt,
+                    roles
+            ));
+        } catch (org.springframework.security.authentication.BadCredentialsException exc) {
+            throw new BadCredentialsException("Invalid email or password");
+        }
     }
 }
 

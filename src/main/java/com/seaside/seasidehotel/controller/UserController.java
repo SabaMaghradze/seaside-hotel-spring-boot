@@ -28,7 +28,7 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/{email}")
     public ResponseEntity<?> getUserByEmail(@PathVariable String email) {
-        return ResponseEntity.status(HttpStatus.FOUND).body(userService.getUser(email));
+        return ResponseEntity.ok(userService.getUser(email));
     }
 
     @DeleteMapping("/delete/{userId}")

@@ -46,4 +46,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleRoleAlreadyExistsException(RoleAlreadyExistsException exc) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(exc.getMessage());
     }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<String> handleBadCredentialsException(BadCredentialsException exc) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exc.getMessage());
+    }
 }

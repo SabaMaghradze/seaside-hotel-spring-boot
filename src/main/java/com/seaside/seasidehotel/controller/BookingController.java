@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -24,7 +25,6 @@ public class BookingController {
 
     private final BookingService bookingService;
     private final RoomService roomService;
-    private final UserService userService;
 
     private BookingResponse getBookingResponse(Booking booking) {
         Room room = roomService.getRoomById(booking.getRoom().getId());
@@ -43,6 +43,7 @@ public class BookingController {
     }
 
     @GetMapping("/all-bookings")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<BookingResponse>> getAllBookings() {
 
         List<Booking> allBookings = bookingService.getAllBookings();
@@ -94,7 +95,7 @@ public class BookingController {
         }
     }
 
-    @GetMapping("/user/{userEmail}")
+    @GetMapping("/user/{userEmail}/bookings")
     public ResponseEntity<?> getBookingsByUserEmail(@PathVariable String userEmail) {
 
         List<Booking> bookings = bookingService.getBookingsByUserEmail(userEmail);
@@ -105,7 +106,7 @@ public class BookingController {
             responses.add(response);
         }
 
-        return ResponseEntity.status(HttpStatus.FOUND).body(responses);
+        return ResponseEntity.ok(responses);
     }
 }
 
