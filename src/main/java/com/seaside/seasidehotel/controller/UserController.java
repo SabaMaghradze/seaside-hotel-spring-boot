@@ -37,5 +37,10 @@ public class UserController {
         userService.deleteUser(email);
         return ResponseEntity.ok("User has been deleted successfully!");
     }
+
+    @PatchMapping
+    public ResponseEntity<?> updatePassword(String password) {
+        return null;
+    }
 }
 
