@@ -1,14 +1,19 @@
 package com.seaside.seasidehotel.controller;
 
 import com.seaside.seasidehotel.model.User;
+import com.seaside.seasidehotel.response.ApiResponse;
 import com.seaside.seasidehotel.service.RoleService;
 import com.seaside.seasidehotel.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -17,7 +22,9 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
+    private final ApiResponse apiResponse;
 
     @GetMapping("/all-users")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -38,9 +45,45 @@ public class UserController {
         return ResponseEntity.ok("User has been deleted successfully!");
     }
 
-    @PatchMapping
-    public ResponseEntity<?> updatePassword(String password) {
-        return null;
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse> updatePassword(
+            @RequestParam String currentPassword,
+            @RequestParam String password,
+            @RequestParam String confirmPassword,
+            Principal principal
+    ) {
+
+        User user = userService.getUser(principal.getName());
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse(false, "User not found"));
+        }
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, "Wrong Password"));
+        }
+
+        if (!password.equals(confirmPassword)) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, "Passwords do not match"));
+        }
+
+        user.setPassword(passwordEncoder.encode(password));
+        userService.updateUser(user);
+
+//        URI redirectUri = URI.create("/profile?message=Password+has+been+successfully+changed");
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .body(new ApiResponse(true, "Password has been successfully changed"));
     }
 }
+
+
+
+
+
+
+
+
 
