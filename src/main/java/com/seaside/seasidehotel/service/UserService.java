@@ -18,4 +18,8 @@ public interface UserService {
 
     User updateUser(User user);
 
+    void updateResetToken(String email, String resetToken);
+
+    User getUserByResetToken(String token);
+
 }

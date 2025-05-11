@@ -3,6 +3,7 @@ package com.seaside.seasidehotel.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -23,6 +24,10 @@ public class User {
     private String email;
 
     private String password;
+
+    private String resetToken;
+
+    private LocalDateTime resetTokenExpiry;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
     @JoinTable(name = "user_roles",

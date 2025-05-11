@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
+// all of these return plain text rather than JSON, needs restructuring to e.g.:
+
+//ApiResponse response = new ApiResponse(false, exc.getMessage());
+//return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -52,3 +57,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exc.getMessage());
     }
 }
+
+
+
+
+
+
+
+

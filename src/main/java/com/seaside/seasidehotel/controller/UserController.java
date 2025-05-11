@@ -45,7 +45,7 @@ public class UserController {
         return ResponseEntity.ok("User has been deleted successfully!");
     }
 
-    @PostMapping("/reset-password")
+    @PostMapping("/update-password")
     public ResponseEntity<ApiResponse> updatePassword(
             @RequestParam String currentPassword,
             @RequestParam String password,

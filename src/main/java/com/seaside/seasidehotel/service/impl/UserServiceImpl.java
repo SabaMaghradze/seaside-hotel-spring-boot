@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,6 +36,7 @@ public class UserServiceImpl implements UserService {
 
         Role userRole = roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new RoleNotFoundException("Role ROLE_USER not found."));
+
         user.setRoles(Collections.singletonList(userRole));
 
         return userRepository.save(user);
@@ -71,4 +73,35 @@ public class UserServiceImpl implements UserService {
     public User updateUser(User user) {
         return userRepository.save(user);
     }
+
+    @Override
+    public void updateResetToken(String email, String resetToken) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        user.setResetToken(resetToken);
+        user.setResetTokenExpiry(LocalDateTime.now().plusMinutes(1));
+        userRepository.save(user);
+    }
+
+    @Override
+    public User getUserByResetToken(String token) {
+        return userRepository.findByResetToken(token)
+                .orElseThrow(() -> new UserNotFoundException("Token is invalid or has expired"));
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
