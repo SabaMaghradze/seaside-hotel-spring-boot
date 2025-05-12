@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 
 @Setter
@@ -28,6 +29,17 @@ public class User {
     private String resetToken;
 
     private LocalDateTime resetTokenExpiry;
+
+    @Column(nullable = false)
+    private Boolean isEnabled;
+
+    @Column(nullable = false)
+    private Boolean accNonLocked;
+
+    @Column(nullable = false)
+    private Integer numberOfFailedAttempts;
+
+    private Date lockTime;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
     @JoinTable(name = "user_roles",

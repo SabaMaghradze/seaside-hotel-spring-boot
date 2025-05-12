@@ -22,4 +22,12 @@ public interface UserService {
 
     User getUserByResetToken(String token);
 
+    void increaseFailedAttempts(User user);
+
+    void lockAccount(User user);
+
+    Boolean unlockAcc(User user);
+
+    void resetFailedAttempts(User user);
+
 }

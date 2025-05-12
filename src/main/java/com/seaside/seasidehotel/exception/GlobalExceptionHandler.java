@@ -1,7 +1,11 @@
 package com.seaside.seasidehotel.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -16,6 +20,12 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private final HttpServletResponse httpServletResponse;
+
+    public GlobalExceptionHandler(HttpServletResponse httpServletResponse) {
+        this.httpServletResponse = httpServletResponse;
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException exc) {
@@ -53,9 +63,25 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<String> handleBadCredentialsException(BadCredentialsException exc) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exc.getMessage());
+    public ResponseEntity<?> handleBadCredentials(BadCredentialsException ex, HttpServletRequest request) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("status", httpServletResponse.SC_UNAUTHORIZED);
+        body.put("error", "Unauthorized");
+        body.put("message", ex.getMessage());
+        body.put("path", request.getServletPath());
+        return ResponseEntity.status(HttpServletResponse.SC_UNAUTHORIZED).body(body);
     }
+
+    @ExceptionHandler(LockedException.class)
+    public ResponseEntity<?> handleLockedException(LockedException ex, HttpServletRequest request) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
+        body.put("error", "Account Locked");
+        body.put("message", ex.getMessage());
+        body.put("path", request.getServletPath());
+        return ResponseEntity.status(HttpServletResponse.SC_UNAUTHORIZED).body(body);
+    }
+
 }
 
 

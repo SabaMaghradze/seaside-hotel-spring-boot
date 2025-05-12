@@ -1,6 +1,5 @@
 package com.seaside.seasidehotel.controller;
 
-import com.seaside.seasidehotel.exception.BadCredentialsException;
 import com.seaside.seasidehotel.exception.UserNotFoundException;
 import com.seaside.seasidehotel.model.User;
 import com.seaside.seasidehotel.request.LoginRequest;
@@ -9,21 +8,23 @@ import com.seaside.seasidehotel.response.JwtResponse;
 import com.seaside.seasidehotel.security.jwt.JwtUtils;
 import com.seaside.seasidehotel.security.user.UserDtls;
 import com.seaside.seasidehotel.service.UserService;
+import com.seaside.seasidehotel.utils.AppConstants;
 import com.seaside.seasidehotel.utils.CommonUtils;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
@@ -52,6 +53,13 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
+        String email = loginRequest.getEmail();
+        User user = userService.getUser(email);
+
+        if (user == null) {
+            throw new BadCredentialsException("User not found");
+        }
+
         try {
             Authentication authentication = authManager
                     .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
@@ -66,6 +74,8 @@ public class AuthController {
                     .stream()
                     .map(GrantedAuthority::getAuthority).toList();
 
+            userService.resetFailedAttempts(user);
+
             return ResponseEntity.ok(new JwtResponse(
                     userDetails.getId(),
                     userDetails.getEmail(),
@@ -73,8 +83,26 @@ public class AuthController {
                     roles
             ));
 
-        } catch (org.springframework.security.authentication.BadCredentialsException exc) {
-            throw new BadCredentialsException("Invalid email or password");
+        } catch (AuthenticationException exception) {
+            if (user.getIsEnabled()) {
+                if (user.getAccNonLocked()) {
+                    if (user.getNumberOfFailedAttempts() < AppConstants.ATTEMPT_COUNT) {
+                        userService.increaseFailedAttempts(user);
+                        throw new BadCredentialsException("Incorrect Credentials, Please Try Again");
+                    } else {
+                        userService.lockAccount(user);
+                        throw new LockedException("Your account has been locked, failed attempt N.3");
+                    }
+                } else {
+                    if (userService.unlockAcc(user)) {
+                        throw new LockedException("Your account is unlocked, please try again.");
+                    } else {
+                        throw new LockedException("Your account is locked, please try again later");
+                    }
+                }
+            } else {
+                throw new LockedException("Your account is inactive");
+            }
         }
     }
 

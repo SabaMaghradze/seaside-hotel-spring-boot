@@ -8,6 +8,7 @@ import com.seaside.seasidehotel.model.User;
 import com.seaside.seasidehotel.repository.RoleRepository;
 import com.seaside.seasidehotel.repository.UserRepository;
 import com.seaside.seasidehotel.service.UserService;
+import com.seaside.seasidehotel.utils.AppConstants;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -89,6 +91,42 @@ public class UserServiceImpl implements UserService {
     public User getUserByResetToken(String token) {
         return userRepository.findByResetToken(token)
                 .orElseThrow(() -> new UserNotFoundException("Token is invalid or has expired"));
+    }
+
+    @Override
+    public void increaseFailedAttempts(User user) {
+        user.setNumberOfFailedAttempts(user.getNumberOfFailedAttempts() + 1);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void resetFailedAttempts(User user) {
+        user.setNumberOfFailedAttempts(null);
+    }
+
+    @Override
+    public void lockAccount(User user) {
+        user.setAccNonLocked(false);
+        user.setLockTime(new Date());
+        userRepository.save(user);
+    }
+
+    @Override
+    public Boolean unlockAcc(User user) {
+
+        long lockTime = user.getLockTime().getTime();
+        long unlockTime = lockTime + AppConstants.UNLOCK_DURATION_TIME;
+
+        long currentTime = System.currentTimeMillis();
+
+        if (unlockTime < currentTime) {
+            user.setAccNonLocked(true);
+            user.setLockTime(null);
+            user.setNumberOfFailedAttempts(0);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
     }
 }
 
