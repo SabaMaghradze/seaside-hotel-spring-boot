@@ -1,11 +1,9 @@
 package com.seaside.seasidehotel.security.jwt;
-import com.seaside.seasidehotel.security.user.UserDtls;
 import com.seaside.seasidehotel.security.user.UserDtlsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
